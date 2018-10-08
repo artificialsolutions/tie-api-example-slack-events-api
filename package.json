@@ -1,19 +1,26 @@
 {
-  "name": "@slack/events-api-example-greet-and-react",
+  "name": "@artificialsolutions/tie-api-example-slack-events-api",
   "version": "1.0.0",
   "private": true,
-  "description": "A basic example of using the Slack Events API Adapter for Node",
-  "main": "index.js",
+  "description": "A basic example of using Teneo and the Slack Events API Adapter for Node",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node server.js"
   },
-  "author": "Ankur Oberoi <aoberoi@gmail.com>",
-  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/artificialsolutions/tie-api-example-slack-events-api"
+  },
+  "author": "Lucas Willering",
+  "license": "Apache 2.0",
   "dependencies": {
     "@aoberoi/passport-slack": "^1.0.5",
     "@slack/client": "^4.3.1",
     "@slack/events-api": "^2.0.0",
     "express": "^4.16.3",
-    "passport": "^0.3.2"
+    "passport": "^0.3.2",
+    "redis": "^2.8.0",
+    "@artificialsolutions/tie-api-client": "^1.1.2"
   }
 }
