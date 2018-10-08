@@ -75,6 +75,7 @@ app.use('/slack/events', slackEvents.expressMiddleware());
 slackEvents.on('message', (message, body) => {
 
   console.log(message);
+  console.log(body);
 
   // Only deal with messages that have no subtype (plain messages) and contain 'hi'
   if (!message.subtype) {
