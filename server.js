@@ -66,6 +66,10 @@ app.use('/slack/events', slackEvents.expressMiddleware());
 
 // *** Greeting any user that says "hi" ***
 slackEvents.on('message', (message, body) => {
+
+  console.log(message);
+  console.log(body);
+  
   // Only deal with messages that have no subtype (plain messages) and contain 'hi'
   if (!message.subtype && message.text.indexOf('hi') >= 0) {
     // Initialize a client
