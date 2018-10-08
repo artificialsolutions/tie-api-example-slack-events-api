@@ -69,7 +69,7 @@ slackEvents.on('message', (message, body) => {
 
   console.log(message);
   console.log(body);
-  
+
   // Only deal with messages that have no subtype (plain messages) and contain 'hi'
   if (!message.subtype && message.text.indexOf('hi') >= 0) {
     // Initialize a client
@@ -79,23 +79,12 @@ slackEvents.on('message', (message, body) => {
       return console.error('No authorization found for this team. Did you install this app again after restarting?');
     }
     // Respond to the message back in the same channel
-    slack.chat.postMessage({ channel: message.channel, text: `Hello <@${message.user}>! :tada:` })
-      .catch(console.error);
+    handleSlackMessage(SessionHandler(),message, slack);
+    // slack.chat.postMessage({ channel: message.channel, text: `Hello <@${message.user}>! :tada:` })
+    //   .catch(console.error);
   }
 });
 
-// *** Responding to reactions with the same emoji ***
-slackEvents.on('reaction_added', (event, body) => {
-  // Initialize a client
-  const slack = getClientByTeamId(body.team_id);
-  // Handle initialization failure
-  if (!slack) {
-    return console.error('No authorization found for this team. Did you install this app again after restarting?');
-  }
-  // Respond to the reaction back with the same emoji
-  slack.chat.postMessage(event.item.channel, `:${event.reaction}:`)
-    .catch(console.error);
-});
 
 // *** Handle errors ***
 slackEvents.on('error', (error) => {
@@ -113,3 +102,79 @@ const port = process.env.PORT || 3000;
 http.createServer(app).listen(port, () => {
   console.log(`server listening on port ${port}`);
 });
+
+/* *
+ * SESSION HANDLER
+ * */
+function SessionHandler() {
+  const redisClient = redis.createClient({ prefix: 'sl', url: redisCloudUrl});
+
+  return {
+    getSession: (userId) => new Promise((resolve, reject) => {
+      redisClient.get(userId, (err, res) => {
+        if (err) reject(err);
+        resolve(res);
+      });
+    }),
+    setSession: (userId, sessionId) => new Promise((resolve, reject) => {
+      redisClient.set(userId, sessionId, (err1) => {
+        if (err1) reject(err1);
+
+        const oneDay = 24 * 60 * 60;
+        redisClient.expire(userId, oneDay, (err2) => {
+          if (err2) reject(err2);
+          resolve();
+        });
+      });
+    })
+  };
+}
+
+async function handleSlackMessage(sessionHandler,message,slack) {
+  
+  try {
+    console.log(`Got message '${message.text}' from channel ${message.channel}`);
+
+    // find engine session id mapped to channel id
+    const sessionId = await sessionHandler.getSession(message.channel);
+
+    // send message to engine using sessionId
+    const teneoResponse = await teneoApi.sendInput(sessionId, {
+      text: message.text
+    });
+
+    console.log(`Got Teneo Engine response '${teneoResponse.output.text}' for session ${teneoResponse.sessionId}`);
+
+    // store mapping between channel and engine sessionId
+    await sessionHandler.setSession(message.channel, teneoResponse.sessionId);
+
+    // construct slack message with engine output text
+    const slackMessage = createSlackMessage(message.channel, teneoResponse.output.text);
+
+    // send message to slack with engine output text
+    await sendSlackMessage(slackMessage,slack);
+
+  } catch (error) {
+    console.error(`Failed when sending input to Teneo Engine @ ${teneoEngineUrl}`, error);
+  }
+
+}
+
+
+function createSlackMessage(channel, text) {
+  return {
+    message: text,
+    channel: channel
+  };
+}
+
+async function sendSlackMessage(messageData,slack) {
+  slack.chat.postMessage({ channel: messageData.channel, text: messageData.message})
+    .then((msg) => console.log(`Message sent to channel ${messageData.channel} with ts:${msg.ts}`))
+    .catch(console.error);
+
+  // rtm.sendMessage(messageData.message, messageData.channel)
+  //     // Returns a promise that resolves when the message is sent
+  //     .then((msg) => console.log(`Message sent to channel ${messageData.channel} with ts:${msg.ts}`))
+  //     .catch(console.error);
+}
