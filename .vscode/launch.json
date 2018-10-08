@@ -1,0 +1,20 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "type": "node",
+            "request": "launch",
+            "name": "Launch Program",
+            "program": "${workspaceFolder}/server.js",
+            "env": {
+                "SLACK_CLIENT_ID":"44000536689.450597664545",
+                "SLACK_CLIENT_SECRET":"aa02a994df09491ca3c5053041a40243",
+                "SLACK_SIGNING_SECRET":"6167ab709b4ec8b6f2d34d2a1827851a",
+                "TENEO_ENGINE_URL": "https://developerarea-dev.teneocloud.com/tiesdktest/"
+            }
+        }
+    ]
+}
