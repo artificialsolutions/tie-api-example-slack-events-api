@@ -9,16 +9,12 @@
     ],
     "repository": "https://github.com/artificialsolutions/tie-api-example-slack/",
     "env": {
-        "SLACK_CLIENT_ID": {
-            "description": "Please input you Slack Client ID",
-            "required":true
-        },
-        "SLACK_CLIENT_SECRET": {
-            "description": "Please input you Slack Client Secret",
-            "required":true
-        },
         "SLACK_SIGNING_SECRET": {
-            "description": "Please input you Slack Signing Secret",
+            "description": "Please input your Slack Signing Secret",
+            "required":true
+        },
+        "SLACK_BOT_USER_OAUTH_ACCESS_TOKEN": {
+            "description": "Please input your Slack Bot User Oauth Access Token",
             "required":true
         },
         "TENEO_ENGINE_URL": {

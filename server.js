@@ -1,115 +1,78 @@
 const slackEventsApi = require('@slack/events-api');
 const SlackClient = require('@slack/client').WebClient;
-const passport = require('passport');
-const SlackStrategy = require('@aoberoi/passport-slack').default.Strategy;
 const http = require('http');
 const express = require('express');
 const redis = require('redis');
-
 const TIE = require('@artificialsolutions/tie-api-client');
-const redisCloudUrl = process.env.REDISCLOUD_URL; // optional, will use localhost if null
+
+// mandatory environment variables
+const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
+const slackBotUserOAuthToken = process.env.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN;
 const teneoEngineUrl = process.env.TENEO_ENGINE_URL;
 
-const teneoApi = TIE.init(teneoEngineUrl);
+// optional environment variables
+const redisCloudUrl = process.env.REDISCLOUD_URL;
+const port = process.env.PORT || 3000;
 
-// *** Initialize event adapter using signing secret from environment variables ***
-const slackEvents = slackEventsApi.createEventAdapter(process.env.SLACK_SIGNING_SECRET, {
+// initialize event adapter using signing secret from environment variables
+const slackEvents = slackEventsApi.createEventAdapter(slackSigningSecret, {
   includeBody: true
 });
 
-// Initialize a data structures to store team authorization info (typically stored in a database)
-const botAuthorizations = {}
+// initialize a slack webclient for posting messages
+const slack = new SlackClient(slackBotUserOAuthToken);
 
-// Helpers to cache and lookup appropriate client
-// NOTE: Not enterprise-ready. if the event was triggered inside a shared channel, this lookup
-// could fail but there might be a suitable client from one of the other teams that is within that
-// shared channel.
-const clients = {};
-function getClientByTeamId(teamId) {
-  if (!clients[teamId] && botAuthorizations[teamId]) {
-    clients[teamId] = new SlackClient(botAuthorizations[teamId]);
-  }
-  if (clients[teamId]) {
-    return clients[teamId];
-  }
-  return null;
-}
+// initialize a Teneo client for interacting with TeneoEengine
+const teneoApi = TIE.init(teneoEngineUrl);
 
-// Initialize Add to Slack (OAuth) helpers
-passport.use(new SlackStrategy({
-  clientID: process.env.SLACK_CLIENT_ID,
-  clientSecret: process.env.SLACK_CLIENT_SECRET,
-  skipUserProfile: true,
-}, (accessToken, scopes, team, extra, profiles, done) => {
-  botAuthorizations[team.id] = extra.bot.accessToken;
-  done(null, {});
-}));
-
-// Initialize an Express application
+// initialize an Express application
 const app = express();
 
-// Plug the Add to Slack (OAuth) helpers into the express app
-app.use(passport.initialize());
+// basic response for get request at root
 app.get('/', (req, res) => {
-  res.send('<a href="/auth/slack"><img alt="Add to Slack" height="40" width="139" src="https://platform.slack-edge.com/img/add_to_slack.png" srcset="https://platform.slack-edge.com/img/add_to_slack.png 1x, https://platform.slack-edge.com/img/add_to_slack@2x.png 2x" /></a>');
+  res.send('Teneo Slack Connector running');
 });
-app.get('/auth/slack', passport.authenticate('slack', {
-  scope: ['bot']
-}));
-app.get('/auth/slack/callback',
-  passport.authenticate('slack', { session: false }),
-  (req, res) => {
-    res.send('<p>Greet and React was successfully installed on your team. <a href="/">back</a></p>');
-  },
-  (err, req, res, next) => {
-    res.status(500).send(`<p>Greet and React failed to install</p> <pre>${err}</pre>`);
-  }
-);
 
-// *** Plug the event adapter into the express app as middleware ***
+// plug the event adapter into the express app as middleware
 app.use('/slack/events', slackEvents.expressMiddleware());
 
-// *** Attach listeners to the event adapter ***
+// *** attach listeners to the event adapter ***
 
-// *** Greeting any user that says "hi" ***
-slackEvents.on('message', (message, body) => {
+// *** send messages to Engine and handle response ***
+slackEvents.on('message', (message) => {
 
-  console.log(message);
-  console.log(body);
-
-  // Only deal with messages that have no subtype (plain messages) and contain 'hi'
+  // only deal with messages that have no subtype (plain messages)
   if (!message.subtype) {
-    // Initialize a client
-    const slack = getClientByTeamId(body.team_id);
-    // Handle initialization failure
+
+    console.log(message);
+
+    // handle initialization failure
     if (!slack) {
-      return console.error('No authorization found for this team. Did you install this app again after restarting?');
+      return console.error('No slack webclient. Did you provide a valid SLACK_BOT_USER_ACCESS_TOKEN?');
     }
 
-    handleSlackMessage(SessionHandler(),message,slack);
+    handleSlackMessage(SessionHandler(),message);
 
   }
 });
 
 
-// *** Handle errors ***
+// *** handle errors ***
 slackEvents.on('error', (error) => {
   if (error.code === slackEventsApi.errorCodes.TOKEN_VERIFICATION_FAILURE) {
-    // This error type also has a `body` propery containing the request body which failed verification.
-    console.error(`An unverified request was sent to the Slack events Request URL. Request body: \
-${JSON.stringify(error.body)}`);
+    // this error type also has a `body` propery containing the request body which failed verification.
+    console.error(`An unverified request was sent to the Slack events Request URL. Request body: ${JSON.stringify(error.body)}`);
   } else {
     console.error(`An error occurred while handling a Slack event: ${error.message}`);
   }
 });
 
-// Start the express application
-const port = process.env.PORT || 3000;
+// start the express application
 http.createServer(app).listen(port, () => {
   console.log(`server listening on port ${port}`);
 });
 
-async function handleSlackMessage(sessionHandler,message,slack) {
+async function handleSlackMessage(sessionHandler,message) {
 
   try {
     console.log(`Got message '${message.text}' from channel ${message.channel}`);
@@ -131,7 +94,7 @@ async function handleSlackMessage(sessionHandler,message,slack) {
     const slackMessage = createSlackMessage(message.channel, teneoResponse);
 
     // send message to slack with engine output text
-    await sendSlackMessage(slackMessage,slack);
+    await sendSlackMessage(slackMessage);
 
   } catch (error) {
     console.error(`Failed when sending input to Teneo Engine @ ${teneoEngineUrl}`, error);
@@ -147,7 +110,8 @@ function createSlackMessage(channel, teneoResponse) {
   };
 }
 
-function sendSlackMessage(messageData,slack) {
+// send slack message
+function sendSlackMessage(messageData) {
   slack.chat.postMessage(messageData)
     .catch(console.error);
 }
