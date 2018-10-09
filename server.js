@@ -43,16 +43,12 @@ slackEvents.on('message', (message) => {
 
   // only deal with messages that have no subtype (plain messages)
   if (!message.subtype) {
-
-    console.log(message);
-
     // handle initialization failure
     if (!slack) {
       return console.error('No slack webclient. Did you provide a valid SLACK_BOT_USER_ACCESS_TOKEN?');
     }
-
+    // send message to engine an return answer
     handleSlackMessage(SessionHandler(),message);
-
   }
 });
 
