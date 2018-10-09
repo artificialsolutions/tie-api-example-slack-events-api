@@ -20,7 +20,12 @@ const slackEvents = slackEventsApi.createEventAdapter(slackSigningSecret, {
 });
 
 // initialize a slack webclient for posting messages
-const slack = new SlackClient(slackBotUserOAuthToken);
+const slack = new SlackClient(slackBotUserOAuthToken, {
+  retryConfig: {
+    // Turn off Slack's retry feature, to prevent multiple messages being sent to Heroku app that wakes up from sleep
+    retries: 0,
+  },
+});
 
 // initialize a Teneo client for interacting with TeneoEengine
 const teneoApi = TIE.init(teneoEngineUrl);
