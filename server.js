@@ -16,16 +16,11 @@ const port = process.env.PORT || 3000;
 
 // initialize event adapter using signing secret from environment variables
 const slackEvents = slackEventsApi.createEventAdapter(slackSigningSecret, {
-  includeBody: true
+  includeHeaders: true
 });
 
 // initialize a slack webclient for posting messages
-const slack = new SlackClient(slackBotUserOAuthToken, {
-  retryConfig: {
-    // Turn off Slack's retry feature, to prevent multiple messages being sent to Heroku app that wakes up from sleep
-    retries: 0,
-  },
-});
+const slack = new SlackClient(slackBotUserOAuthToken);
 
 // initialize a Teneo client for interacting with TeneoEengine
 const teneoApi = TIE.init(teneoEngineUrl);
@@ -41,13 +36,14 @@ app.get('/', (req, res) => {
 // plug the event adapter into the express app as middleware
 app.use('/slack/events', slackEvents.expressMiddleware());
 
+
 // *** attach listeners to the event adapter ***
 
 // *** send messages to Engine and handle response ***
-slackEvents.on('message', (message) => {
+slackEvents.on('message', (message, headers) => {
 
-  // only deal with messages that have no subtype (plain messages)
-  if (!message.subtype) {
+  // only deal with messages that have no subtype (plain messages) and that are not retries
+  if (!message.subtype && !headers["x-slack-retry-reason"]) {
     // handle initialization failure
     if (!slack) {
       return console.error('No slack webclient. Did you provide a valid SLACK_BOT_USER_ACCESS_TOKEN?');
