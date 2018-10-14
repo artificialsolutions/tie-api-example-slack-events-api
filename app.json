@@ -3,11 +3,10 @@
     "description": "A Slack bot powered by Teneo.",
     "keywords": [
         "bot",
-        "Slackr",
-        "Teneo",
-        "CAI"
+        "Slack",
+        "Teneo"
     ],
-    "repository": "https://github.com/artificialsolutions/tie-api-example-slack/",
+    "repository": "https://github.com/artificialsolutions/tie-api-example-slack-events-api/",
     "env": {
         "SLACK_SIGNING_SECRET": {
             "description": "Please input your Slack Signing Secret",
