@@ -1,1 +1,57 @@
 # tie-api-example-slack-events-api
+This node.js example connector allows you to make your Teneo bot available on Slack. The connector acts as middleware between Slack and Teneo and uses the Slack Events API to receive messages from Slack. This guide will take you through the steps of creating a new Slack app and deploying the connector to respond to events sent by Slack.
+
+## Prerequisites
+### Https
+The Slack Events API requires that the connector is available via https. On this page we will be using Heroku to host this connector, for which a (free) Heroku account is needed. You can however also manually install the connector on a location of your choice, see [Running the connector locally](#running-the-connector-locally).
+
+### Redis
+Because we need to map a Slack channel id with a sessionId from engine, we need to store this mapping. This connector uses Redis for that. If you follow the instructions on this page, the free RedisCloud addon will be automatically installed in your Heroku app. However, even though the addon is free, you will need to provide Billing details in your Heroku account to be able to install addons.
+
+### Teneo Engine
+Your bot needs to be published and you need to know the engine url.
+
+## Setup instructions
+### Create a Slack app
+Create a new Slack app here: [https://api.slack.com/apps](https://api.slack.com/apps?new_app=1). Give it a name and add it to the appropriate workspace.
+
+On the page that appears, scroll to the bottom of the screen and copy the <mark>Signing Secret</mark>. You will need it later when you deploy the connector.
+
+### Add bot user
+In the left navigation menu under 'Features' choose 'Bot Users' and add a bot user. You might also want to turn on 'Always Show My Bot as Online'.
+
+### Install App to Workspace
+In the left navigation menu under 'Settings' choose 'Install App'. Click the 'Install App to Workspace' button and authorize. Copy the <mark>Bot User OAuth Access Token</mark>, you will need it in the next step when you deploy the connector.
+
+### Deploy the connector
+Click the button below to deploy the connector to Heroku:
+	[![Deploy](https://www.herokucdn.com/deploy/button.svg?classes=noborder)](https://heroku.com/deploy?template=https://github.com/artificialsolutions/tie-api-example-slack-events-api)
+
+In the 'Config Vars' section, add the following:
+* **SLACK_SIGNING_SECRET:** The 'Signing Secret' you copied when you created the Slack app 
+* **SLACK_BOT_USER_OAUTH_ACCESS_TOKEN:** The 'Bot User OAuth Access Token' you copied when you installed the app to your workspace
+* **TENEO_ENGINE_URL:** The engine url
+
+Click 'View app' and copy the url of your Heroku app, you will need it in the next step.
+
+!!! If you prefer to run your bot locally, see [Running the connector locally](#running-the-connector-locally).
+
+### Subscribe to events
+Go back to your app on Slack. In the left navigation menu under 'Features' choose 'Event Subscriptions'. Then:
+	1. Turn on Enable Events
+	2. Enter the following URL in the Request URL field: https://[yourherokuappname].herokuapp.com/slack/events (replace [yourherokuappname] with the name of your app on Heroku)
+	3. Under 'Subscribe to Bot Events', subscribe to the following event: <mark>message.im</mark>
+	4. Save changes
+
+That's it! Your bot should now be available in Slack and responding to messages that are sent to it.
+
+## Running the connector locally
+If you prefer to manually install this connector or run it locally, proceed as follows:
+1. Download, install and run Redis by following the instructions here: [redis.io/download](https://redis.io/download).
+2. Download or clone the connector source code from [Github](https://github.com/artificialsolutions/tie-api-example-slack-events-api).
+3. Install dependencies by running `npm install` in the folder where you stored the source.
+4. Make sure your connecter is available via https. When running locally you can for example use ngrok for this: [ngork.com](https://ngrok.com). The connector runs on port 3000 by default.
+5. Start the connector with the following command (replacing the environment variables with the appropriate values):
+    ```
+    SLACK_SIGNING_SECRET=<your_slack_signing_secret> SLACK_BOT_USER_OAUTH_ACCESS_TOKEN=<your_slack_bot_oauth_token> TENEO_ENGINE_URL=<your_engine_url> node server.js
+    ```
