@@ -52,6 +52,8 @@ app.get('/', (req, res) => {
 // plug the event adapter into the express app as middleware
 app.use('/slack/events', slackEvents.expressMiddleware());
 
+// initialise session handler, to store mapping between slack 'channel' and engine session
+const sessionHandler = SessionHandler();
 
 // *** attach listeners to the event adapter ***
 
@@ -65,7 +67,7 @@ slackEvents.on('message', (message, headers) => {
       return console.error('No slack webclient. Did you provide a valid SLACK_BOT_USER_ACCESS_TOKEN?');
     }
     // send message to engine an return answer
-    handleSlackMessage(SessionHandler(),message);
+    handleSlackMessage(sessionHandler,message);
   }
 });
 

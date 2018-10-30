@@ -15,10 +15,10 @@
   "author": "Lucas Willering",
   "license": "Apache 2.0",
   "dependencies": {
+    "@artificialsolutions/tie-api-client": "^1.1.2",
     "@slack/client": "^4.3.1",
     "@slack/events-api": "^2.0.0",
-    "express": "^4.16.3",
-    "redis": "^2.8.0",
-    "@artificialsolutions/tie-api-client": "^1.1.2"
+    "express": "^4.16.4",
+    "redis": "^2.8.0"
   }
 }
