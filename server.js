@@ -119,6 +119,10 @@ async function handleSlackMessage(sessionHandler,message) {
 
 // create slack message
 function createSlackMessage(channel, teneoResponse) {
+
+  // your bot can use output parameters to populate attachments
+  // you would find those in teneoResponse.output.parameters
+
   return {
     text: teneoResponse.output.text,
     channel: channel
