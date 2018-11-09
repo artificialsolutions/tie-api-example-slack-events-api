@@ -12,7 +12,7 @@
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
  * See the License for the specific language governing permissions and
  * limitations under the License.
- */ 
+ */
 
 const slackEventsApi = require('@slack/events-api');
 const SlackClient = require('@slack/client').WebClient;
@@ -67,7 +67,7 @@ slackEvents.on('message', (message, headers) => {
       return console.error('No slack webclient. Did you provide a valid SLACK_BOT_USER_ACCESS_TOKEN?');
     }
     // send message to engine an return answer
-    handleSlackMessage(sessionHandler,message);
+    handleSlackMessage(sessionHandler, message);
   }
 });
 
@@ -87,7 +87,7 @@ http.createServer(app).listen(port, () => {
   console.log(`server listening on port ${port}`);
 });
 
-async function handleSlackMessage(sessionHandler,message) {
+async function handleSlackMessage(sessionHandler, message) {
 
   try {
     console.log(`Got message '${message.text}' from channel ${message.channel}`);
@@ -122,11 +122,21 @@ function createSlackMessage(channel, teneoResponse) {
 
   // your bot can use output parameters to populate attachments
   // you would find those in teneoResponse.output.parameters
+  const message = {};
 
-  return {
-    text: teneoResponse.output.text,
-    channel: channel
-  };
+  // populate base message
+  message.text = teneoResponse.output.text;
+  message.channel = channel;
+
+  // check for attachment
+  if (teneoResponse.output.parameters.slack) {
+    try {
+      message.attachments = [JSON.parse(teneoResponse.output.parameters.slack)];
+    } catch (error_attach) {
+      console.error(`Failed when parsing attachment JSON`, error_attach);
+    }
+  }
+  return message
 }
 
 // send slack message
@@ -139,7 +149,7 @@ function sendSlackMessage(messageData) {
  * SESSION HANDLER
  * */
 function SessionHandler() {
-  const redisClient = redis.createClient({ prefix: 'sl', url: redisCloudUrl});
+  const redisClient = redis.createClient({ prefix: 'sl', url: redisCloudUrl });
 
   return {
     getSession: (userId) => new Promise((resolve, reject) => {
