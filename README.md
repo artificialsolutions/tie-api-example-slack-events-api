@@ -46,6 +46,19 @@ Go back to your app on Slack. In the left navigation menu under 'Features' choos
 
 That's it! Your bot should now be available in Slack and responding to messages that are sent to it.
 
+## Adding message attachments
+To add [message attachments](https://api.slack.com/docs/message-attachments), this connector looks for an output parameter `slack` in the engine response. The value of that parameter is assumed to contain the attachement JSON as defined by Slack.
+
+If we look at Slack's JSON specification of [attachments](https://api.slack.com/docs/message-attachments#attachment_structure), to attach an image the value of the `slack` output parameter would need to look like this: 
+```
+{
+    "fallback": "Image description as fallback",
+    "image_url": "https://url.to/an/image.png"
+}
+```
+
+Note: although it is possible to add multiple attachments to a Slack message, this connector assumes the output parameter contains just the JSON for a single attachment.
+
 ## Running the connector locally
 If you prefer to manually install this connector or run it locally, proceed as follows:
 1. Download, install and run Redis by following the instructions here: [redis.io/download](https://redis.io/download).
