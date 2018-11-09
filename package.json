@@ -12,7 +12,7 @@
     "url": "https://github.com/artificialsolutions/tie-api-example-slack-events-api"
   },
   "author": "Lucas Willering",
-  "license": "Apache 2.0",
+  "license": "Apache-2.0",
   "dependencies": {
     "@artificialsolutions/tie-api-client": "^1.1.2",
     "@slack/client": "^4.3.1",
