@@ -64,7 +64,7 @@ If you prefer to manually install this connector or run it locally, proceed as f
 1. Download, install and run Redis by following the instructions here: [redis.io/download](https://redis.io/download).
 2. Download or clone the connector source code from [Github](https://github.com/artificialsolutions/tie-api-example-slack-events-api).
 3. Install dependencies by running `npm install` in the folder where you stored the source.
-4. Make sure your connecter is available via https. When running locally you can for example use ngrok for this: [ngork.com](https://ngrok.com). The connector runs on port 3000 by default.
+4. Make sure your connector is available via https. When running locally you can for example use ngrok for this: [ngrok.com](https://ngrok.com). The connector runs on port 3000 by default.
 5. Start the connector with the following command (replacing the environment variables with the appropriate values):
     ```
     SLACK_SIGNING_SECRET=<your_slack_signing_secret> SLACK_BOT_USER_OAUTH_ACCESS_TOKEN=<your_slack_bot_oauth_token> TENEO_ENGINE_URL=<your_engine_url> node server.js
