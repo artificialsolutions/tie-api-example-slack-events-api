@@ -151,17 +151,17 @@ var sessionMap = new Map();
 
 function SessionHandler() {
   return {
-    getSession: (userId) =>  new Promise((resolve, reject) => {	
-		if(sessionMap.size>0){
-			resolve([...sessionMap].find(([key,val]) => key == userId)[1]);
-		}
-		else{
-			resolve("")
-		}
-	}),
-    setSession: (userId, sessionId) => new Promise((resolve, reject) =>{
-		sessionMap.set(userId,sessionId);
-		resolve();
-	})
+    getSession: (userId) => new Promise((resolve, reject) => {
+      if (sessionMap.size > 0) {
+        resolve([...sessionMap].find(([key, val]) => key == userId)[1]);
+      }
+      else {
+        resolve("")
+      }
+    }),
+    setSession: (userId, sessionId) => new Promise((resolve, reject) => {
+      sessionMap.set(userId, sessionId);
+      resolve();
+    })
   };
 }
