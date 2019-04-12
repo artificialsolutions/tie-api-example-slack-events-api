@@ -18,7 +18,6 @@ const slackEventsApi = require('@slack/events-api');
 const SlackClient = require('@slack/client').WebClient;
 const http = require('http');
 const express = require('express');
-const redis = require('redis');
 const TIE = require('@artificialsolutions/tie-api-client');
 
 // mandatory environment variables
@@ -26,8 +25,8 @@ const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
 const slackBotUserOAuthToken = process.env.SLACK_BOT_USER_OAUTH_ACCESS_TOKEN;
 const teneoEngineUrl = process.env.TENEO_ENGINE_URL;
 
+
 // optional environment variables
-const redisCloudUrl = process.env.REDISCLOUD_URL;
 const port = process.env.PORT || 3000;
 
 // initialize event adapter using signing secret from environment variables
@@ -149,25 +148,24 @@ function sendSlackMessage(messageData) {
  * SESSION HANDLER
  * */
 function SessionHandler() {
-  const redisClient = redis.createClient({ prefix: 'sl', url: redisCloudUrl });
+
+  // Map the slack user id to the teneo engine session id. 
+  // This code keeps the map in memory, which is ok for testing purposes
+  // For production usage it is advised to make use of more resilient storage mechanisms like redis
+  const sessionMap = new Map();
 
   return {
     getSession: (userId) => new Promise((resolve, reject) => {
-      redisClient.get(userId, (err, res) => {
-        if (err) reject(err);
-        resolve(res);
-      });
+      if (sessionMap.size > 0) {
+        resolve([...sessionMap].find(([key, val]) => key == userId)[1]);
+      }
+      else {
+        resolve("")
+      }
     }),
     setSession: (userId, sessionId) => new Promise((resolve, reject) => {
-      redisClient.set(userId, sessionId, (err1) => {
-        if (err1) reject(err1);
-
-        const oneDay = 24 * 60 * 60;
-        redisClient.expire(userId, oneDay, (err2) => {
-          if (err2) reject(err2);
-          resolve();
-        });
-      });
+      sessionMap.set(userId, sessionId);
+      resolve();
     })
   };
 }
