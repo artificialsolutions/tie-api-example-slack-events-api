@@ -147,9 +147,13 @@ function sendSlackMessage(messageData) {
 /* *
  * SESSION HANDLER
  * */
-var sessionMap = new Map();
-
 function SessionHandler() {
+
+  // Map the slack user id to the teneo engine session id. 
+  // This code keeps the map in memory, which is ok for testing purposes
+  // For production usage it is advised to make use of more resilient storage mechanisms like redis
+  const sessionMap = new Map();
+
   return {
     getSession: (userId) => new Promise((resolve, reject) => {
       if (sessionMap.size > 0) {
