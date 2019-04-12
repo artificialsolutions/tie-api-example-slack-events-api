@@ -157,7 +157,7 @@ function SessionHandler() {
   return {
     getSession: (userId) => new Promise((resolve, reject) => {
       if (sessionMap.size > 0) {
-        resolve([...sessionMap].find(([key, val]) => key == userId)[1]);
+        resolve(sessionMap.get(userId));
       }
       else {
         resolve("")
