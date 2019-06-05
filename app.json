@@ -20,8 +20,5 @@
             "description": "Please input your Teneo Engine URL. https://some.engine/instance/",
             "required":true
         }
-    },
-    "addons": [
-        "rediscloud:30"
-    ]
+    }
 }

@@ -5,9 +5,6 @@ This node.js example connector allows you to make your Teneo bot available on Sl
 ### Https
 The Slack Events API requires that the connector is available via https. On this page we will be using Heroku to host this connector, for which a (free) Heroku account is needed. You can however also manually install the connector on a location of your choice, see [Running the connector locally](#running-the-connector-locally).
 
-### Redis
-Because we need to map a Slack channel id with a sessionId from engine, we need to store this mapping. This connector uses Redis for that. If you follow the instructions on this page, the free RedisCloud addon will be automatically installed in your Heroku app. However, even though the addon is free, you will need to provide Billing details in your Heroku account to be able to install addons.
-
 ### Teneo Engine
 Your bot needs to be published and you need to know the engine url.
 
@@ -40,8 +37,8 @@ If you prefer to run your bot locally, see [Running the connector locally](#runn
 ### Subscribe to events
 Go back to your app on Slack. In the left navigation menu under 'Features' choose 'Event Subscriptions'. Then:
 1. Turn on Enable Events
-2. Enter the following URL in the Request URL field: https://[yourherokuappname].herokuapp.com/slack/events (replace [yourherokuappname] with the name of your app on Heroku)
-3. Under 'Subscribe to Bot Events', subscribe to the following event: 'message.im'
+2. Enter the following URL in the Request URL field: `https://[yourherokuappname].herokuapp.com/slack/events` (replace [yourherokuappname] with the name of your app on Heroku)
+3. Under 'Subscribe to Bot Events', subscribe to the following event: `message.im`
 4. Save changes
 
 That's it! Your bot should now be available in Slack and responding to messages that are sent to it.
@@ -61,11 +58,13 @@ Note: although it is possible to add multiple attachments to a Slack message, th
 
 ## Running the connector locally
 If you prefer to manually install this connector or run it locally, proceed as follows:
-1. Download, install and run Redis by following the instructions here: [redis.io/download](https://redis.io/download).
-2. Download or clone the connector source code from [Github](https://github.com/artificialsolutions/tie-api-example-slack-events-api).
-3. Install dependencies by running `npm install` in the folder where you stored the source.
-4. Make sure your connector is available via https. When running locally you can for example use ngrok for this: [ngrok.com](https://ngrok.com). The connector runs on port 3000 by default.
-5. Start the connector with the following command (replacing the environment variables with the appropriate values):
+1. Download or clone the connector source code from [Github](https://github.com/artificialsolutions/tie-api-example-slack-events-api).
+2. Install dependencies by running `npm install` in the folder where you stored the source.
+3. Make sure your connector is available via https. When running locally you can for example use ngrok for this: [ngrok.com](https://ngrok.com). The connector runs on port 3000 by default.
+    ```
+    ngrok http 3000
+    ```
+4. Start the connector with the following command (replacing the environment variables with the appropriate values):
     ```
     SLACK_SIGNING_SECRET=<your_slack_signing_secret> SLACK_BOT_USER_OAUTH_ACCESS_TOKEN=<your_slack_bot_oauth_token> TENEO_ENGINE_URL=<your_engine_url> node server.js
     ```
