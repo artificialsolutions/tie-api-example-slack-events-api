@@ -19,6 +19,8 @@ const SlackClient = require('@slack/client').WebClient;
 const http = require('http');
 const express = require('express');
 const TIE = require('@artificialsolutions/tie-api-client');
+const dotenv = require('dotenv');
+dotenv.config();
 
 // mandatory environment variables
 const slackSigningSecret = process.env.SLACK_SIGNING_SECRET;
