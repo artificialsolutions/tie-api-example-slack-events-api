@@ -60,7 +60,7 @@ const sessionHandler = SessionHandler();
 slackEvents.on('message', (message, headers) => {
 
   // only deal with messages that have no subtype (plain messages) and that are not retries
-  if (!message.subtype && !headers["x-slack-retry-reason"]) {
+  if (!message.subtype && !headers["x-slack-retry-reason"] && !message.bot_id) {
     // handle initialization failure
     if (!slack) {
       return console.error('No slack webclient. Did you provide a valid SLACK_BOT_USER_ACCESS_TOKEN?');
