@@ -14,11 +14,11 @@ Create a new Slack app here: [https://api.slack.com/apps](https://api.slack.com/
 
 On the page that appears, scroll to the bottom of the screen and copy the 'Signing Secret'. You will need it later when you deploy the connector.
 
-### Add bot user
-In the left navigation menu under 'Features' choose 'Bot Users' and add a bot user. You might also want to turn on 'Always Show My Bot as Online'.
+## Add Bot Token Scopes
+In the left navigation menu under 'Features' choose 'OAuth & Permissions'. Scroll down until you see 'Scopes'. Under 'Bot Token Scopes' click the 'Add an OAuth Scope' button. In the field that appears type 'chat:write'
 
 ### Install App to Workspace
-In the left navigation menu under 'Settings' choose 'Install App'. Click the 'Install App to Workspace' button and authorize. Copy the 'Bot User OAuth Access Token', you will need it in the next step when you deploy the connector.
+Still on the 'OAuth & Permissions', scroll back to the top and click the 'Install App to Workspace' button and authorize. Copy the 'Bot User OAuth Access Token', you will need it in the next step when you deploy the connector.
 
 ### Deploy the connector
 Click the button below to deploy the connector to Heroku:
@@ -38,6 +38,7 @@ If you prefer to run your bot locally, see [Running the connector locally](#runn
 Go back to your app on Slack. In the left navigation menu under 'Features' choose 'Event Subscriptions'. Then:
 1. Turn on Enable Events
 2. Enter the following URL in the Request URL field: `https://[yourherokuappname].herokuapp.com/slack/events` (replace [yourherokuappname] with the name of your app on Heroku)
+    Note that the url ends with '/slack/event'
 3. Under 'Subscribe to Bot Events', subscribe to the following event: `message.im`
 4. Save changes
 
