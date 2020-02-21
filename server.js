@@ -96,7 +96,8 @@ async function handleSlackMessage(sessionHandler, message) {
 
     // send message to engine using sessionId
     const teneoResponse = await teneoApi.sendInput(sessionId, {
-      text: message.text
+      text: message.text,
+      'channel': 'slack'
     });
 
     console.log(`Got Teneo Engine response '${teneoResponse.output.text}' for session ${teneoResponse.sessionId}`);
