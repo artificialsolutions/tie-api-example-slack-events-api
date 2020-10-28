@@ -38,11 +38,11 @@ If you prefer to run your bot locally, see [Running the connector locally](#runn
 Go back to your app on Slack. In the left navigation menu under 'Features' choose 'Event Subscriptions'. Then:
 1. Turn on Enable Events
 2. Enter the following URL in the Request URL field: `https://[yourherokuappname].herokuapp.com/slack/events` (replace [yourherokuappname] with the name of your app on Heroku)
-    Note that the url ends with '/slack/event'
+    Note that the url ends with '/slack/events', and that the connector is already running locally, or on Heroku, to avoid a 'Challenge parameter' error.
 3. Under 'Subscribe to Bot Events', subscribe to the following event: `message.im`
-4. Save changes
+4. Save changes. Reinstall the app, if recommended by the dashboard
 
-That's it! Your bot should now be available in Slack and responding to messages that are sent to it.
+That's it! Your bot should now be available as an app in Slack and ready to respont to the messages sent to it.
 
 ## Adding message attachments
 To add [message attachments](https://api.slack.com/docs/message-attachments), this connector looks for an output parameter `slack` in the engine response. The value of that parameter is assumed to contain the attachement JSON as defined by Slack.
@@ -65,7 +65,12 @@ If you prefer to manually install this connector or run it locally, proceed as f
     ```
     ngrok http 3000
     ```
-4. Start the connector with the following command (replacing the environment variables with the appropriate values):
-    ```
+4. Create a file called .env in the project's root folder, based on the sample file called '.env.sample' that is included in the project. Inside .env, replace the environment variables with the corresponding values: 
+   ```
     SLACK_SIGNING_SECRET=<your_slack_signing_secret> SLACK_BOT_USER_OAUTH_ACCESS_TOKEN=<your_slack_bot_oauth_token> TENEO_ENGINE_URL=<your_engine_url> node server.js
+    ```
+
+5. Start the connector with the following command:
+    ```
+    node server.js
     ```
