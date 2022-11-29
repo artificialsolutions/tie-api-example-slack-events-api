@@ -2,8 +2,10 @@
 This node.js example connector allows you to make your Teneo bot available on Slack. The connector acts as middleware between Slack and Teneo and uses the Slack Events API to receive messages from Slack. This guide will take you through the steps of creating a new Slack app and deploying the connector to respond to events sent by Slack.
 
 ## Prerequisites
+
+**Note: Starting November 28, 2022, free Heroku Dynos, free Heroku Postgres, and free Heroku Data for Redis® plans will no longer be available.**
 ### Https
-The Slack Events API requires that the connector is available via https. On this page we will be using Heroku to host this connector, for which a (free) Heroku account is needed. You can however also manually install the connector on a location of your choice, see [Running the connector locally](#running-the-connector-locally).
+The Slack Events API requires that the connector is available via https. On this page we will be using Heroku to host this connector, for which a Heroku account is needed. You can however also manually install the connector on a location of your choice, see [Running the connector locally](#running-the-connector-locally).
 
 ### Teneo Engine
 Your bot needs to be published and you need to know the engine url.
