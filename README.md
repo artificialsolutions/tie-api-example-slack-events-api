@@ -1,4 +1,9 @@
 # tie-api-example-slack-events-api
+
+> [!IMPORTANT]
+> This project has been retired and archived  
+> If there is a need of continued use / development of this project for your own needs please feel free to fork the project - which will remain here in archived form.
+
 This node.js example connector allows you to make your Teneo bot available on Slack. The connector acts as middleware between Slack and Teneo and uses the Slack Events API to receive messages from Slack. This guide will take you through the steps of creating a new Slack app and deploying the connector to respond to events sent by Slack.
 
 ## Prerequisites
